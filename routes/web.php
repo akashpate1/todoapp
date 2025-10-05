@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
@@ -15,6 +16,13 @@ Route::middleware([
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+
+    Route::get('project',[ProjectController::class,'index'])->name('project.index');
+    Route::post('project',[ProjectController::class,'store'])->name('project.store');
+    Route::get('project/{project:slug}',[ProjectController::class,'show'])->name('project.show');
+    Route::put('project/{project:slug}',[ProjectController::class,'update'])->name('project.update');
+    Route::delete('project/{project:slug}',[ProjectController::class,'destroy'])->name('project.destroy');
 });
 
 require __DIR__.'/settings.php';
