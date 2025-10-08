@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Project } from '@/types/project';
 import { useForm } from '@inertiajs/react';
+import { fallbackAvatar } from '@/lib/utils';
 
 type Props  = {
     project: Project;
@@ -35,7 +36,7 @@ export function ProjectAccess({project}: Props){
                             {project.users?.map((user) => (
                                 <Avatar key={user.id}>
                                     <AvatarImage src={user.avatar} />
-                                    <AvatarFallback>{user.name}</AvatarFallback>
+                                    <AvatarFallback>{fallbackAvatar(user.name)}</AvatarFallback>
                                 </Avatar>
                             ))}
                         </div>
@@ -50,7 +51,7 @@ export function ProjectAccess({project}: Props){
                                     <div key={user.id} className={"flex flex-row gap-6 items-center"}>
                                         <Avatar key={user.id}>
                                             <AvatarImage src={user.avatar} />
-                                            <AvatarFallback>{user.name}</AvatarFallback>
+                                            <AvatarFallback>{fallbackAvatar(user.name)}</AvatarFallback>
                                         </Avatar>
                                         <div className={"flex flex-col"}>
                                             {user.name} <br/>

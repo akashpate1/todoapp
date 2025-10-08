@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { CircleCheck, List, Loader, Timer } from 'lucide-react';
 import { Project } from '@/types/project';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { fallbackAvatar } from '@/lib/utils';
 
 type Props = {
     isEditing: boolean,
@@ -78,7 +79,7 @@ function TaskUserDropDown({users, handleChange, user_id}: UserDropDownProps) {
                         <SelectItem key={user.id} value={String(user.id)}>
                             <Avatar>
                                 <AvatarImage src={user.avatar}/>
-                                <AvatarFallback>{user.name.substring(0,2)}</AvatarFallback>
+                                <AvatarFallback>{fallbackAvatar(user.name)}</AvatarFallback>
                             </Avatar>
                             {user.name}
                         </SelectItem>
