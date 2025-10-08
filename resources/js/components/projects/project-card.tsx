@@ -27,6 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Project } from '@/types/project';
 import { router, useForm } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 type Props = {
     project: Project;
@@ -44,11 +45,19 @@ export default function ProjectCard({project} : Props) {
         description: project.description ?? "",
     })
     const handleUpdateProject = () => {
-        put("/project/"+project.slug)
+        put("/project/"+project.slug,{
+            onSuccess: () => {
+                toast.success('Project updated successfully!');
+            }
+        })
     }
 
     const handleDeleteProject = () => {
-        router.delete("/project/"+project.slug)
+        router.delete("/project/"+project.slug,{
+            onSuccess: () => {
+                toast.success('Project deleted successfully!');
+            }
+        })
     }
 
     return (

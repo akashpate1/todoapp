@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserInvited;
+use App\Http\Requests\InviteUesrRequest;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -74,8 +77,36 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
+        $project->load('users');
+        $project->load('tasks');
+        $project->load('tasks.user');
+
         return Inertia::render('projects/show',[
             'project' => $project,
         ]);
+    }
+
+    public function invite(InviteUesrRequest $request, Project $project)
+    {
+        $existingAccess = ProjectAccess::query()
+            ->where('email',$request->get('email'))
+            ->where('project_id',$project->id)
+            ->whereNotNull('accepted_at')
+            ->exists();
+
+        if($existingAccess){
+            return to_route('project.show',[$project])->with('error','User already have access to the project');
+        }
+
+        /** @var ProjectAccess $projectAccess */
+        $projectAccess = $project->accesses()->create([
+            'invitation_token' => Str::uuid(),
+            'expires_at' => Carbon::now()->addDay()->toDateTimeString(),
+            'email' => $request->get('email'),
+        ]);
+
+        event(new UserInvited($projectAccess));
+
+        return to_route('project.show',[$project])->with('success','Invitation has been sent successfully');
     }
 }

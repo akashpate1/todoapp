@@ -12,7 +12,8 @@ class ProjectAccess extends Model
         'user_id',
         'invitation_token',
         'expires_at',
-        'accepted_at'
+        'accepted_at',
+        'email'
     ];
 
     public function user(): BelongsTo

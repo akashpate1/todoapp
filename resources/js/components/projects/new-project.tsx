@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle, PlusIcon } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 type CreateProjectForm = {
     name: string;
