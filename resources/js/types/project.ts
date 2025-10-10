@@ -7,5 +7,6 @@ export type Project = {
     description: string;
     name: string;
     users?: User[];
+    user?: User;
     tasks: Task[];
 }
