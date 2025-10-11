@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
@@ -15,9 +16,7 @@ Route::middleware([
     'auth',
     ValidateSessionWithWorkOS::class,
 ])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
 
     Route::get('project',[ProjectController::class,'index'])->name('project.index');
