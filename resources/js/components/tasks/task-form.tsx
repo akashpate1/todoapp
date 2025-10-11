@@ -17,7 +17,7 @@ import { useForm } from '@inertiajs/react';
 import { User } from '@/types';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CircleCheck, List, Loader, Timer } from 'lucide-react';
+import { AlertCircle, CircleCheck, List, Loader, Timer } from 'lucide-react';
 import { Project } from '@/types/project';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { fallbackAvatar } from '@/lib/utils';
@@ -33,7 +33,7 @@ type TaskForm = {
     title: string;
     description: string;
     status: "todo" | "in_progress" | "done";
-    user_id: number;
+    user_id: number | null;
 }
 
 type StatusDropDownProps = {
@@ -92,11 +92,11 @@ function TaskUserDropDown({users, handleChange, user_id}: UserDropDownProps) {
 
 export default function TaskForm({isEditing, task, project, children}: Props){
 
-    const {data, setData, processing, post, put} = useForm<TaskForm>({
+    const {data, setData, processing, post, put, errors} = useForm<TaskForm>({
         title: task?.title ?? "",
         description: task?.description ?? "",
         status: task?.status ?? "todo",
-        user_id: task?.user?.id ?? 0
+        user_id: task?.user?.id ?? null
     });
 
     const handleSave = () => {
@@ -121,7 +121,13 @@ export default function TaskForm({isEditing, task, project, children}: Props){
                         <Label htmlFor="title">Title</Label>
                         <Input onChange={event => {
                             setData("title",event.target.value)
-                        }} id="title" value={data.title} name="title" type={'text'} />
+                        }} id="title" value={data.title} name="title" type={'text'} className={errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''} />
+                        {errors.title && (
+                            <p className="text-sm text-red-500 flex items-center gap-1">
+                                <AlertCircle className="h-4 w-4" />
+                                {errors.title}
+                            </p>
+                        )}
                     </div>
                     <div className="grid gap-3">
                         <Label htmlFor="description">Description</Label>
@@ -135,7 +141,7 @@ export default function TaskForm({isEditing, task, project, children}: Props){
                     </div>
                     <div className="grid gap-3">
                         <Label htmlFor="user">User</Label>
-                        <TaskUserDropDown user_id={String(data.user_id)} handleChange={user_id => {console.log(user_id);setData("user_id",user_id)}}  users={project.users ?? []} />
+                        <TaskUserDropDown user_id={String(data.user_id)} handleChange={user_id => {setData("user_id",user_id)}}  users={project.users ?? []} />
                     </div>
                 </div>
                 <DialogFooter>

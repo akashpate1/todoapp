@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\InvitationEmail;
 use Illuminate\Foundation\Http\FormRequest;
 
 class InviteUesrRequest extends FormRequest
@@ -22,7 +23,7 @@ class InviteUesrRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email',
+            'email' => ['required', 'email', new InvitationEmail()]
         ];
     }
 }

@@ -88,16 +88,6 @@ class ProjectController extends Controller
 
     public function invite(InviteUesrRequest $request, Project $project)
     {
-        $existingAccess = ProjectAccess::query()
-            ->where('email',$request->get('email'))
-            ->where('project_id',$project->id)
-            ->whereNotNull('accepted_at')
-            ->exists();
-
-        if($existingAccess){
-            return to_route('project.show',[$project])->with('error','User already have access to the project');
-        }
-
         /** @var ProjectAccess $projectAccess */
         $projectAccess = $project->accesses()->create([
             'invitation_token' => Str::uuid(),
@@ -105,7 +95,7 @@ class ProjectController extends Controller
             'email' => $request->get('email'),
         ]);
 
-        event(new UserInvited($projectAccess));
+//        event(new UserInvited($projectAccess));
 
         return to_route('project.show',[$project])->with('success','Invitation has been sent successfully');
     }

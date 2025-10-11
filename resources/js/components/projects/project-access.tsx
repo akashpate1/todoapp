@@ -1,12 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ShareIcon } from 'lucide-react';
+import { AlertCircle, Share } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Project } from '@/types/project';
 import { useForm } from '@inertiajs/react';
 import { fallbackAvatar } from '@/lib/utils';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 type Props  = {
     project: Project;
@@ -16,12 +18,15 @@ type InviteUserForm = {
 }
 export function ProjectAccess({project}: Props){
 
-
-    const { data, setData, put, processing } = useForm<InviteUserForm>()
+    const { data, setData, put, processing, errors } = useForm<InviteUserForm>()
+    const [inviteModalOpen, setInviteModalOpen] = useState(false);
+    const [usersModalOpen, setUsersModalOpen] = useState(false);
 
     const handleInviteUser = () => {
         put("/project/"+project.slug+"/invite",{
             onSuccess: () => {
+                toast.success('User invited successfully!');
+                setInviteModalOpen(false);
             }
         })
     }
@@ -29,10 +34,9 @@ export function ProjectAccess({project}: Props){
     return (
         <>
             <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 ">
-                <Dialog>
-
+                <Dialog open={usersModalOpen} onOpenChange={setUsersModalOpen}>
                     <DialogTrigger asChild>
-                        <div className={"flex gap-2"}>
+                        <div className={"flex gap-2 cursor-pointer"}>
                             {project.users?.map((user) => (
                                 <Avatar key={user.id}>
                                     <AvatarImage src={user.avatar} />
@@ -45,54 +49,65 @@ export function ProjectAccess({project}: Props){
                         <DialogHeader>
                             <DialogTitle>Project Users</DialogTitle>
                         </DialogHeader>
-                        <div>
+                        <div className="flex flex-col gap-3">
                             {project.users?.map((user) => (
-                                <div className="flex flex-col gap-3">
-                                    <div key={user.id} className={"flex flex-row gap-6 items-center"}>
-                                        <Avatar key={user.id}>
-                                            <AvatarImage src={user.avatar} />
-                                            <AvatarFallback>{fallbackAvatar(user.name)}</AvatarFallback>
-                                        </Avatar>
-                                        <div className={"flex flex-col"}>
-                                            {user.name} <br/>
-                                            {user.email}
-                                        </div>
+                                <div key={user.id} className={"flex flex-row gap-6 items-center"}>
+                                    <Avatar>
+                                        <AvatarImage src={user.avatar} />
+                                        <AvatarFallback>{fallbackAvatar(user.name)}</AvatarFallback>
+                                    </Avatar>
+                                    <div className={"flex flex-col"}>
+                                        <span>{user.name}</span>
+                                        <span className="text-sm text-muted-foreground">{user.email}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </DialogContent>
                 </Dialog>
-
             </div>
-            <Dialog>
-                <form>
-                    <DialogTrigger asChild>
-                        <Button variant={"outline"}><ShareIcon/></Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Invite User</DialogTitle>
-                            <DialogDescription>
-                                Invite the user to your project using email id.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4">
-                            <div className="grid gap-3">
-                                <Label htmlFor="email">Email</Label>
-                                <Input onChange={event => {
-                                    setData("email",event.target.value)
-                                }} id="email" value={data.email} name="email" type={'email'} />
-                            </div>
+
+            <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
+                <DialogTrigger asChild>
+                    <Button variant={"outline"}><Share/></Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Invite User</DialogTitle>
+                        <DialogDescription>
+                            Invite the user to your project using email id.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4">
+                        <div className="grid gap-3">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                onChange={event => {
+                                    setData("email", event.target.value)
+                                }}
+                                id="email"
+                                value={data.email}
+                                name="email"
+                                type={'email'}
+                                className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            />
+                            {errors.email && (
+                                <p className="text-sm text-red-500 flex items-center gap-1">
+                                    <AlertCircle className="h-4 w-4" />
+                                    {errors.email}
+                                </p>
+                            )}
                         </div>
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <Button onClick={handleInviteUser} type="button">Invite</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </form>
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button onClick={handleInviteUser} type="button" disabled={processing}>
+                            Invite
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
             </Dialog>
         </>
     )

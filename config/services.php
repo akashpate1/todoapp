@@ -17,6 +17,9 @@ return [
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
+    'sendgrid' => [
+        'secret' => env('SENDGRID_SECRET'),
+    ],
 
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
