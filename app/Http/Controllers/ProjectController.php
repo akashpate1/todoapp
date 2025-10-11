@@ -21,7 +21,7 @@ class ProjectController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $projects = $user->projects();
+        $projects = $user->projects()->with('user');
 
         return Inertia::render('projects/index',[
             'projects' => $projects->paginate(9),
