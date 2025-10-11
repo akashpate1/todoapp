@@ -39,7 +39,7 @@ type UpdateProjectForm = {
     description: string;
 }
 
-type AuthProps = {
+export type AuthProps = {
     user: User;
 }
 

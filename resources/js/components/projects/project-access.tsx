@@ -5,10 +5,11 @@ import { AlertCircle, Share } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Project } from '@/types/project';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { fallbackAvatar } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { AuthProps } from '@/components/projects/project-card';
 
 type Props  = {
     project: Project;
@@ -30,6 +31,8 @@ export function ProjectAccess({project}: Props){
             }
         })
     }
+
+    const authProps: AuthProps = usePage().props.auth as AuthProps;
 
     return (
         <>
@@ -67,48 +70,50 @@ export function ProjectAccess({project}: Props){
                 </Dialog>
             </div>
 
-            <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
-                <DialogTrigger asChild>
-                    <Button variant={"outline"}><Share/></Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Invite User</DialogTitle>
-                        <DialogDescription>
-                            Invite the user to your project using email id.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4">
-                        <div className="grid gap-3">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                onChange={event => {
-                                    setData("email", event.target.value)
-                                }}
-                                id="email"
-                                value={data.email}
-                                name="email"
-                                type={'email'}
-                                className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
-                            />
-                            {errors.email && (
-                                <p className="text-sm text-red-500 flex items-center gap-1">
-                                    <AlertCircle className="h-4 w-4" />
-                                    {errors.email}
-                                </p>
-                            )}
+            {project.user?.id === authProps.user.id && (
+                <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant={"outline"}><Share/></Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Invite User</DialogTitle>
+                            <DialogDescription>
+                                Invite the user to your project using email id.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4">
+                            <div className="grid gap-3">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    onChange={event => {
+                                        setData("email", event.target.value)
+                                    }}
+                                    id="email"
+                                    value={data.email}
+                                    name="email"
+                                    type={'email'}
+                                    className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                                />
+                                {errors.email && (
+                                    <p className="text-sm text-red-500 flex items-center gap-1">
+                                        <AlertCircle className="h-4 w-4" />
+                                        {errors.email}
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
-                        </DialogClose>
-                        <Button onClick={handleInviteUser} type="button" disabled={processing}>
-                            Invite
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <Button onClick={handleInviteUser} type="button" disabled={processing}>
+                                Invite
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            )}
         </>
     )
 }

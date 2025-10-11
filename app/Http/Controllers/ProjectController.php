@@ -77,6 +77,7 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
+        $project->load('user');
         $project->load('users');
         $project->load('tasks');
         $project->load('tasks.user');
@@ -95,7 +96,7 @@ class ProjectController extends Controller
             'email' => $request->get('email'),
         ]);
 
-//        event(new UserInvited($projectAccess));
+        event(new UserInvited($projectAccess));
 
         return to_route('project.show',[$project])->with('success','Invitation has been sent successfully');
     }
