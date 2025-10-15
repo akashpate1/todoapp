@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class DashboardController
@@ -22,17 +23,25 @@ class DashboardController
             ->with(['project','project.user'])
             ->get();
 
+
+        $stats = Cache::remember('stats',300, function() use ($user, $projectIds) {
+            return [
+                'in_progress_tasks' => Task::query()
+                    ->whereIn('project_id',$projectIds)
+                    ->where('user_id',$user->id)
+                    ->where('status','in_progress')->count(),
+                'completed_tasks' => Task::query()
+                    ->whereIn('project_id',$projectIds)
+                    ->where('user_id',$user->id)
+                    ->where('status','done')->count(),
+            ];
+        });
+
+
         return Inertia::render('dashboard',[
             'tasks' => $tasks,
             'projects' => count($projectIds),
-            'in_progress_tasks' => Task::query()
-                ->whereIn('project_id',$projectIds)
-                ->where('user_id',$user->id)
-                ->where('status','in_progress')->count(),
-            'completed_tasks' => Task::query()
-                ->whereIn('project_id',$projectIds)
-                ->where('user_id',$user->id)
-                ->where('status','done')->count(),
+            ...$stats,
         ]);
     }
 }
